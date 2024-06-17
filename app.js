@@ -8,6 +8,7 @@ const { MongoClient } = require('mongodb');
 const dotenv = require('dotenv');
 const { ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
+const os = require('os');
 
 // Create Express application
 const app = express();
@@ -739,6 +740,26 @@ async function getEventInfo(eventTagId) {
   return event;
 }
 
+
+// Endpoint to fetch the IPv4 address
+app.get('/get-ip', (req, res) => {
+  // Get the IPv4 address of the computer
+  const ipv4 = getIPv4Address();
+  // Send the IPv4 address as JSON
+  res.json({ ipv4 });
+});
+
+function getIPv4Address() {
+  const interfaces = os.networkInterfaces();
+  for (const key in interfaces) {
+    for (const iface of interfaces[key]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'Unknown';
+}
 
 // Function to retrieve user information from the database based on tag ID
 async function getUserInfo(tagId) {
